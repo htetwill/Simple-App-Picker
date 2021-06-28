@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Portier Technology</string>
+    <string name="dummy_button">Continue</string>
+    <string name="dummy_content">Welcome To \n Hotel Name Guest \n It is a beautiful day in hotel.city. </string>
+</resources>
