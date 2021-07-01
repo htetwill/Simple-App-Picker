@@ -16,20 +16,26 @@ import retrofit2.HttpException
 class HomeViewModel:ViewModel() {
 
     private val config: MutableLiveData<ResultOf<Config>> = MutableLiveData()
+    private val isLoading : MutableLiveData<Boolean> =  MutableLiveData()
 
     fun configLiveData() : LiveData<ResultOf<Config>> = config
+    fun isLoadingLiveData() :  LiveData<Boolean> = isLoading
 
     fun fetchResponse(url: String) {
+
         val apiService = ApiClient.getClient().create(ApiService::class.java)
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val response = apiService.fetchPosts()
-                if (response.isSuccessful) config.postValue(ResultOf.Success(Config()))
+                isLoading.postValue(true)
+                val response = apiService.fetchPosts(url)
+                if (response.isSuccessful) config.postValue(ResultOf.Success(response.body()!!))
                 else config.postValue(ResultOf.Failure("Error: ${response.code()}. Please contact the developer", Exception()))
             } catch (e: HttpException) {
                 config.postValue(ResultOf.Failure(e.message, e))
             } catch (e: Throwable) {
                 config.postValue(ResultOf.Failure(e.message, e))
+            }finally {
+                isLoading.postValue(false)
             }
         }
     }

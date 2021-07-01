@@ -12,4 +12,9 @@
     <color name="light_blue_A200">#FF40C4FF</color>
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
+
+    <color name="snackbar_primary">#E53935</color>
+    <color name="snackbar_surface">#B71C1C</color>
+    <color name="snackbar_text">#FFFFFF</color>
+
 </resources>

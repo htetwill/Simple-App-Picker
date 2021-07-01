@@ -12,7 +12,7 @@ object ApiClient {
         this.level = HttpLoggingInterceptor.Level.BODY
     }
     private var retrofit: Retrofit? = null
-    private const val BASE_URL = "https://www.apphusetreach.no/"
+    private const val BASE_URL = "https://run.mocky.io/"
     private val okHttpClient = OkHttpClient().newBuilder()
         .connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(2, TimeUnit.MINUTES)
