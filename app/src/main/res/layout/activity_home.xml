@@ -9,7 +9,7 @@
     android:theme="@style/ThemeOverlay.PortierTechnology.FullscreenContainer">
 
     <Button
-        android:id="@+id/dummy_button"
+        android:id="@+id/btn_proceed"
         style="?android:attr/buttonBarButtonStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -26,14 +26,14 @@
         android:visibility="invisible"
         android:indeterminate="true"
         app:indicatorColor="@color/purple_700"
-        app:layout_constraintBottom_toTopOf="@+id/dummy_button"
+        app:layout_constraintBottom_toTopOf="@+id/btn_proceed"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 
     <TextView
-        android:id="@+id/fullscreen_content"
+        android:id="@+id/tv_greeting"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
@@ -42,7 +42,7 @@
         android:textColor="@color/light_blue_A400"
         android:textSize="50sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/dummy_button"
+        app:layout_constraintBottom_toTopOf="@+id/btn_proceed"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
