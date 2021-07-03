@@ -7,20 +7,24 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.htetwill.portier.launcher.R
+import com.htetwill.portier.launcher.adapter.CustomAdapter
 import com.htetwill.portier.launcher.databinding.ActivityAppBinding
 import com.htetwill.portier.launcher.viewmodel.AppViewModel
 
 
 class AppActivity : AppCompatActivity(), SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener{
+    private lateinit var currentLayoutManagerType: LayoutManagerType
+    private lateinit var layoutManager: LinearLayoutManager
     private lateinit var menuSearch: MenuItem
     private lateinit var searchView: SearchView
+    enum class LayoutManagerType { LINEAR_LAYOUT_MANAGER }
     private val viewModel by lazy {
         ViewModelProvider(this, AppViewModel.Factory())
             .get(AppViewModel::class.java)
@@ -36,7 +40,7 @@ class AppActivity : AppCompatActivity(), SearchView.OnQueryTextListener, MenuIte
         setSupportActionBar(findViewById(R.id.toolbar))
         handleIntent(intent)
 
-        binding.toolbarLayout.title = title
+        binding.toolbarLayout.title = "title"
         binding.fab.setOnClickListener { view ->
             //Collapse the action view
                 searchView.onActionViewCollapsed()
@@ -47,13 +51,19 @@ class AppActivity : AppCompatActivity(), SearchView.OnQueryTextListener, MenuIte
                 .setAction("Action", null).show()
         }
 
-        val i = Intent(Intent.ACTION_MAIN, null)
-        i.addCategory(Intent.CATEGORY_LAUNCHER)
-        val allApps = packageManager.queryIntentActivities(i, 0)
-        viewModel.loadApps(this.packageManager)
+        binding.appListRecyclerview.adapter = CustomAdapter(viewModel.getApps(this.packageManager))
+        setRecyclerViewLayout()
 
-//        binding.btnExit.setOnClickListener(View.OnClickListener { finish() })
+        binding.fab.setOnClickListener { finish() }
 
+    }
+
+    private fun setRecyclerViewLayout() {
+            layoutManager = LinearLayoutManager(this)
+            currentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER
+            with(binding.appListRecyclerview) {
+                layoutManager = this@AppActivity.layoutManager
+            }
     }
 
 

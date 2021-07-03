@@ -1,5 +1,6 @@
 package com.htetwill.portier.launcher.viewmodel
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -9,11 +10,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.htetwill.portier.launcher.model.AppInfo
 
 class AppViewModel:ViewModel() {
-    private val appInfoList = mutableListOf<AppInfo>()
 
-    fun getAppInfoList() : List<AppInfo> = appInfoList
-
-    fun loadApps(packageManager: PackageManager) {
+    @SuppressLint("QueryPermissionsNeeded")
+    fun getApps(packageManager: PackageManager) : List<AppInfo>{
+        val appInfoList = mutableListOf<AppInfo>()
         val i = Intent(Intent.ACTION_MAIN, null)
         i.addCategory(Intent.CATEGORY_LAUNCHER)
         val allApps = packageManager.queryIntentActivities(i, 0)
@@ -25,11 +25,8 @@ class AppViewModel:ViewModel() {
             appInfoList.add(app)
         }
         appInfoList.sortBy { it.label.toString() }
-//        appsList.clear()
-//        appsList.addAll(loadList)
+        return appInfoList.toList()
     }
-
-
 
     class Factory() : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
