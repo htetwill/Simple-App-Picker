@@ -2,6 +2,7 @@ package com.htetwill.portier.launcher
 
 import androidx.appcompat.app.AppCompatActivity
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
@@ -13,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_SHORT
 import com.google.android.material.snackbar.Snackbar
+import com.htetwill.portier.launcher.activity.AppActivity
 import com.htetwill.portier.launcher.databinding.ActivityHomeBinding
 import com.htetwill.portier.launcher.model.Config
 import com.htetwill.portier.launcher.state.ResultOf
@@ -56,6 +58,8 @@ class HomeActivity : AppCompatActivity() {
         tvGreeting = binding.tvGreeting
         indicator = binding.busyIndicator
         btnProceed = binding.btnProceed
+
+        btnProceed.setOnClickListener(View.OnClickListener { startActivity(Intent(this,AppActivity::class.java)) })
 
         Toast.makeText(this, "param is " + intent.getStringExtra("param"), Toast.LENGTH_SHORT)
             .show()
