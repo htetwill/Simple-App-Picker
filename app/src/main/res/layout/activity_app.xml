@@ -14,16 +14,6 @@
         android:fitsSystemWindows="true"
         android:theme="@style/Theme.PortierTechnology.AppBarOverlay">
 
-<!--
-        <Button
-            android:id="@+id/btn_exit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableBottom="@android:drawable/ic_lock_power_off"
-
-            />
--->
-
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/toolbar_layout"
             android:layout_width="match_parent"
@@ -43,31 +33,14 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+        android:id="@+id/app_list_recyclerview"
+        android:layout_marginTop="@dimen/list_margin"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context=".activity.AppActivity"
-        tools:showIn="@layout/activity_app">
 
-
-
-        <!--
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/text_margin"
-                android:text="@string/large_text" />
-        -->
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/app_list_recyclerview"
-            android:layout_marginTop="@dimen/list_margin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            />
-    </androidx.core.widget.NestedScrollView>
+        />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fab"

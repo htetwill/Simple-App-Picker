@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -49,13 +48,16 @@ class AppActivity : AppCompatActivity(), SearchView.OnQueryTextListener, MenuIte
 
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
+            finish()
         }
-
-        binding.appListRecyclerview.adapter = CustomAdapter(viewModel.getApps(this.packageManager))
+        viewModel.loadInstalledPackage(packageManager)
+        viewModel.loadLiveData().observe(
+            this, {
+                list ->
+                binding.appListRecyclerview.adapter = CustomAdapter(list)
+            }
+        )
         setRecyclerViewLayout()
-
-        binding.fab.setOnClickListener { finish() }
-
     }
 
     private fun setRecyclerViewLayout() {
@@ -120,6 +122,7 @@ class AppActivity : AppCompatActivity(), SearchView.OnQueryTextListener, MenuIte
 
     override fun onQueryTextChange(newText: String?): Boolean {
         Toast.makeText(this, "onQueryTextChange "+newText!!, Toast.LENGTH_SHORT).show()
+        viewModel.loadSearchKeyword(newText)
         return false
     }
 
