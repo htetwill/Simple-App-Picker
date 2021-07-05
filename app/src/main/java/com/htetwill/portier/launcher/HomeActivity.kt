@@ -1,14 +1,17 @@
 package com.htetwill.portier.launcher
 
+import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.progressindicator.LinearProgressIndicator
@@ -20,7 +23,7 @@ import com.htetwill.portier.launcher.model.Config
 import com.htetwill.portier.launcher.state.ResultOf
 import com.htetwill.portier.launcher.viewmodel.HomeViewModel
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
     private lateinit var btnProceed: Button
     private lateinit var indicator: LinearProgressIndicator
     private lateinit var binding: ActivityHomeBinding
@@ -59,21 +62,38 @@ class HomeActivity : AppCompatActivity() {
         indicator = binding.busyIndicator
         btnProceed = binding.btnProceed
 
-        btnProceed.setOnClickListener(View.OnClickListener { startActivity(Intent(this,AppActivity::class.java)) })
+        btnProceed.setOnClickListener(View.OnClickListener {
+            showPermissionPreview()
+        })
 
         Toast.makeText(this, "param is " + intent.getStringExtra("param"), Toast.LENGTH_SHORT)
             .show()
 
         intent.getStringExtra("param")?.let { viewModel.fetchResponse(it) }
-        viewModel.isLoadingLiveData().observe(this, {setLoadingState(it)})
-        viewModel.configLiveData().observe(this, { result -> setWelcomeUI(result)})
+        viewModel.isLoadingLiveData().observe(this, { setLoadingState(it) })
+        viewModel.configLiveData().observe(this, { result -> setWelcomeUI(result) })
+
+
+    }
+
+    private fun showPermissionPreview() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            startActivity(Intent(this,AppActivity::class.java))
+        } else {
+            // Permission is missing and must be requested.
+            requestPermission()
+        }
     }
 
     private fun setWelcomeUI(result: ResultOf<Config>?) {
         when (result) {
             is ResultOf.Success -> {
-                binding.tvGreeting.text = getString(R.string.dummy_content,
-                    result.value.hotel!!.name, result.value.hotel!!.city)
+                binding.tvGreeting.text = getString(
+                    R.string.dummy_content,
+                    result.value.hotel!!.name, result.value.hotel!!.city
+                )
             }
             is ResultOf.Failure -> {
                 result.message?.let { msg -> getSnackbar(msg).show() }
@@ -81,7 +101,7 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun setLoadingState(isLoading : Boolean){
+    private fun setLoadingState(isLoading: Boolean) {
         when (isLoading) {
             true -> {
                 indicator.show()
@@ -109,4 +129,40 @@ class HomeActivity : AppCompatActivity() {
         hideHandler.postDelayed(hidePart2Runnable, 3000.toLong())
     }
 
+    private fun requestPermission() {
+        // Permission has not been granted and must be requested.
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                0
+            )
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                0
+            )
+
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == 0) {
+            if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startActivity(Intent(this,AppActivity::class.java))
+            } else {
+                getSnackbar("Permission Denied !")
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
 }

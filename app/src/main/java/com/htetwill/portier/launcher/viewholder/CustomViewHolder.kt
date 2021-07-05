@@ -7,9 +7,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.htetwill.portier.launcher.R
 import com.htetwill.portier.launcher.databinding.LayoutListItemBinding
+import com.htetwill.portier.launcher.logger.Log
+import com.htetwill.portier.launcher.logger.LogWrapper
 import com.htetwill.portier.launcher.model.AppInfo
 
 class CustomViewHolder (private val rootView: View) : RecyclerView.ViewHolder(rootView){
+    private val TAG = "CustomViewHolder"
     private val binding = LayoutListItemBinding.bind(rootView)
     companion object {
         fun from(parent: ViewGroup): CustomViewHolder {
@@ -34,5 +37,7 @@ class CustomViewHolder (private val rootView: View) : RecyclerView.ViewHolder(ro
         val launchIntent: Intent = rootView.context.packageManager
             .getLaunchIntentForPackage(appPackageName)!!
         rootView.context.startActivity(launchIntent)
+        Log.logNode = LogWrapper()
+        Log.i(TAG, "Launch App : $appPackageName")
     }
 }

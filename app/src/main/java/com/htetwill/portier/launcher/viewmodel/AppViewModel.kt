@@ -8,36 +8,60 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.htetwill.portier.launcher.model.AppInfo
+import java.util.*
 import kotlin.math.min
 
-class AppViewModel:ViewModel() {
+class AppViewModel : ViewModel() {
     private val appsListDisplayed = mutableListOf<AppInfo>()
     private val appInfoList = mutableListOf<AppInfo>()
     private val appListDisplayedLiveData = MutableLiveData<List<AppInfo>>()
 
-    fun loadLiveData() : LiveData<List<AppInfo>> = appListDisplayedLiveData
+    fun listLiveData(): LiveData<List<AppInfo>> = appListDisplayedLiveData
 
-    fun loadSearchKeyword(text:String){
-        appsListDisplayed.clear()
-        if (text.trim().isEmpty()) {
-            appsListDisplayed.addAll(appInfoList)
-        } else {
-            val map = mutableMapOf<AppInfo,Double>()
-            for (item in appInfoList) {
-                map[item] = similarity(
-                    text,
-                    item.label.toString()
-                )
-            }
-            val sorted = map.toList().sortedBy { (key,value) -> value }.reversed().toMap()
-            if (sorted.values.first().equals(1.0)) {
-                appsListDisplayed.add(sorted.keys.first())
+    fun loadSuggestion(keyword: String?) {
+        keyword?.let {
+            appsListDisplayed.clear()
+            if (it.trim().isEmpty()) {
+                appsListDisplayed.addAll(appInfoList)
             } else {
-                appsListDisplayed.addAll(sorted.keys)
-                appsListDisplayed.subList(3,appsListDisplayed.size).clear()
+                val map = mutableMapOf<AppInfo, Double>()
+                for (item in appInfoList) {
+                    map[item] = similarity(
+                        it,
+                        item.label.toString()
+                    )
+                }
+                val sorted = map.toList().sortedBy { (_, value) -> value }.reversed().toMap()
+                if (sorted.values.first().equals(1.0)) {
+                    appsListDisplayed.add(sorted.keys.first())
+                } else {
+                    appsListDisplayed.addAll(sorted.keys)
+                    appsListDisplayed.subList(3, appsListDisplayed.size).clear()
+                }
             }
+            appListDisplayedLiveData.postValue(appsListDisplayed.toList())
         }
-        appListDisplayedLiveData.postValue(appsListDisplayed.toList())
+    }
+
+    fun findAppName(keyword: String?) {
+        keyword?.let {
+            appsListDisplayed.clear()
+            if (it.isEmpty()) {
+                appsListDisplayed.addAll(appInfoList)
+            } else {
+                for (item in appInfoList) {
+                    if (item.label.toString().toLowerCase(Locale.ROOT).contains(
+                            it.toLowerCase(
+                                Locale.ROOT
+                            )
+                        )
+                    ) {
+                        appsListDisplayed.add(item)
+                    }
+                }
+            }
+            appListDisplayedLiveData.postValue(appsListDisplayed.toList())
+        }
     }
 
     /**
