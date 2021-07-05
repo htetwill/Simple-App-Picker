@@ -1,16 +1,14 @@
 package com.htetwill.portier.launcher
 
 import android.Manifest
-import androidx.appcompat.app.AppCompatActivity
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -32,43 +30,15 @@ class HomeActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         ViewModelProvider(this, HomeViewModel.Factory())
             .get(HomeViewModel::class.java)
     }
-    private val hideHandler = Handler()
-    private var isFullscreen: Boolean = false
-
-    @SuppressLint("InlinedApi")
-    private val hidePart2Runnable = Runnable {
-        // Delayed removal of status and navigation bar
-        tvGreeting.systemUiVisibility =
-            View.SYSTEM_UI_FLAG_LOW_PROFILE or
-                    View.SYSTEM_UI_FLAG_FULLSCREEN or
-//                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        isFullscreen = true
-
-//         Set up the user interaction to manually show or hide the system UI.
         tvGreeting = binding.tvGreeting
         indicator = binding.busyIndicator
         btnProceed = binding.btnProceed
-
-        btnProceed.setOnClickListener(View.OnClickListener {
-            showPermissionPreview()
-        })
-
-        Toast.makeText(this, "param is " + intent.getStringExtra("param"), Toast.LENGTH_SHORT)
-            .show()
-
+        btnProceed.setOnClickListener { showPermissionPreview() }
         intent.getStringExtra("param")?.let { viewModel.fetchResponse(it) }
         viewModel.isLoadingLiveData().observe(this, { setLoadingState(it) })
         viewModel.configLiveData().observe(this, { result -> setWelcomeUI(result) })
@@ -80,7 +50,22 @@ class HomeActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
             PackageManager.PERMISSION_GRANTED
         ) {
-            startActivity(Intent(this,AppActivity::class.java))
+            val i = Intent(this, AppActivity::class.java)
+            when (val result = viewModel.configLiveData().value) {
+                is ResultOf.Success -> {
+                    if (result.value.apps.isNullOrEmpty())
+                        i.putStringArrayListExtra("SPONSORED_APP_LIST", ArrayList())
+                    else
+                        i.putStringArrayListExtra(
+                            "SPONSORED_APP_LIST",
+                            ArrayList(result.value.apps)
+                        )
+                }
+                is ResultOf.Failure -> {
+                    i.putStringArrayListExtra("SPONSORED_APP_LIST", ArrayList())
+                }
+            }
+            startActivity(i)
         } else {
             // Permission is missing and must be requested.
             requestPermission()
@@ -94,6 +79,8 @@ class HomeActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
                     R.string.dummy_content,
                     result.value.hotel!!.name, result.value.hotel!!.city
                 )
+                binding.tvGreeting.setTextColor(Color.parseColor(result.value.color))
+                binding.layoutCoordinator.setBackgroundColor(Color.parseColor(result.value.background))
             }
             is ResultOf.Failure -> {
                 result.message?.let { msg -> getSnackbar(msg).show() }
@@ -122,11 +109,6 @@ class HomeActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         snackbar.setActionTextColor(ContextCompat.getColor(this, R.color.snackbar_text))
         snackbar.setTextColor(ContextCompat.getColor(this, R.color.snackbar_text))
         return snackbar
-    }
-
-    override fun onPostCreate(savedInstanceState: Bundle?) {
-        super.onPostCreate(savedInstanceState)
-        hideHandler.postDelayed(hidePart2Runnable, 3000.toLong())
     }
 
     private fun requestPermission() {
@@ -158,7 +140,7 @@ class HomeActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     ) {
         if (requestCode == 0) {
             if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startActivity(Intent(this,AppActivity::class.java))
+                startActivity(Intent(this, AppActivity::class.java))
             } else {
                 getSnackbar("Permission Denied !")
             }

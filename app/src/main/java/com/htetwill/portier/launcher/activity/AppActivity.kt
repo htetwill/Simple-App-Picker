@@ -41,6 +41,7 @@ class AppActivity : AppCompatActivity(), SearchView.OnQueryTextListener, MenuIte
         binding.toolbarLayout.title = getString(R.string.app_name)
         binding.fab.setOnClickListener { finish() }
         viewModel.loadInstalledPackage(packageManager)
+        intent.getStringArrayListExtra("SPONSORED_APP_LIST")?.let { viewModel.filterApps(it) }
         viewModel.listLiveData().observe(
             this, {
                 list ->
@@ -93,6 +94,8 @@ class AppActivity : AppCompatActivity(), SearchView.OnQueryTextListener, MenuIte
 
         return true
     }
+
+
     override fun onQueryTextSubmit(query: String?): Boolean {
         viewModel.findAppName(query)
         return false
@@ -104,9 +107,8 @@ class AppActivity : AppCompatActivity(), SearchView.OnQueryTextListener, MenuIte
     }
 
     override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+        viewModel.loadSuggestion("")
         setRecyclerViewLayout(LayoutManagerType.LINEAR_LAYOUT_MANAGER)
-        Log.i(TAG, "Search Expand")
-
         return true
     }
 
@@ -115,13 +117,11 @@ class AppActivity : AppCompatActivity(), SearchView.OnQueryTextListener, MenuIte
         /** Set up targets to receive log data  */
         val logWrapper = LogWrapper()
         Log.logNode = logWrapper
-        Log.i(TAG, "onStart()")
     }
 
     override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+        intent.getStringArrayListExtra("SPONSORED_APP_LIST")?.let { viewModel.filterApps(it) }
         setRecyclerViewLayout(LayoutManagerType.GRID_LAYOUT_MANAGER)
-        Log.i(TAG, "Search Collapse")
-
         return true
     }
 

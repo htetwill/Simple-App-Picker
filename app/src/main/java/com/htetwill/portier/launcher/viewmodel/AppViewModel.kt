@@ -131,6 +131,14 @@ class AppViewModel : ViewModel() {
         appListDisplayedLiveData.postValue(appInfoList.toList())
     }
 
+    fun filterApps(sponsoredAppList: ArrayList<String>) {
+        val filteredAppList: List<AppInfo> =
+            appInfoList.toList()
+                .filter { appInfo -> sponsoredAppList.contains(appInfo.packageName.toString()) }
+        appListDisplayedLiveData.postValue(filteredAppList)
+    }
+
+
     class Factory() : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(AppViewModel::class.java)) {
