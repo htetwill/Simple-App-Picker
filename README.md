@@ -10,6 +10,7 @@
 - Step 1. Sideload the app via Android Studio or APK installation
 - Step 2. Run the shell script for remote config customization option
 - adb shell am start -a android.intent.action.VIEW -n com.htetwill.portier.launcher/com.htetwill.portier.launcher.HomeActivity -e param v3/396825bb-b390-4ac2-8909-cd362ab0803c
+- Log File is located in Internal Storage Directory with log.txt
 
 # Customize Remote Configuration
 Customizing Configuration -  Step by Step.
