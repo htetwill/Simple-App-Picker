@@ -11,6 +11,14 @@
 - Step 2. Run the shell script for remote config customization option
 - adb shell am start -a android.intent.action.VIEW -n com.htetwill.portier.launcher/com.htetwill.portier.launcher.HomeActivity -e param v3/396825bb-b390-4ac2-8909-cd362ab0803c
 
+# Customize Remote Configuration
+Customizing Configuration -  Step by Step.
+1 ) Customize New Mock with exact JSON Node in https://run.mocky.io which is currently the baseURL.
+2 ) Get the URL of newly customized mock 
+3 ) Run shell script with param payload with new endpoint in this case replace v3/396825bb-b390-4ac2-8909-cd362ab0803c
+ adb shell am start -a android.intent.action.VIEW -n com.htetwill.portier.launcher/com.htetwill.portier.launcher.HomeActivity -e param v3/396825bb-b390-4ac2-8909-cd362ab0803c
+
+
 ## 3rd Party Library and license
 Retrofit A type-safe HTTP client for Android and Java - Apache License
 - handling HTTP protocols with better efficiency
